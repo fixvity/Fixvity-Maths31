@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Quadratic Formula Calculator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+:root{
+  --primary:#2563eb;
+  --bg:#f4f7fb;
+  --card:#ffffff;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,system-ui,Arial;
+  background:var(--bg);
+}
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:24px;
+}
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:28px;
+  box-shadow:0 12px 32px rgba(0,0,0,.08);
+}
+h1{margin:0;color:var(--primary)}
+small{color:#555}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  font-size:16px;
+}
+
+button{
+  width:100%;
+  padding:16px;
+  font-size:17px;
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+}
+button:hover{opacity:.95}
+
+.result{font-weight:700;font-size:18px}
+.formula,.steps{font-size:14px;color:#444;line-height:1.6}
+.error{color:#dc2626;font-weight:600;margin-top:10px}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="card">
+<h1>Quadratic Formula Calculator</h1>
+<small>Accurate quadratic solutions · International standards</small>
+
+<br>
+
+<div class="grid">
+  <input id="a" placeholder="Coefficient a">
+  <input id="b" placeholder="Coefficient b">
+  <input id="c" placeholder="Coefficient c">
+</div>
+
+<br>
+<button onclick="solve()">Calculate</button>
+<div id="error" class="error"></div>
+</div>
+
+<br>
+
+<div class="grid">
+  <div class="card">
+    <div id="output" class="result">Result = —</div>
+  </div>
+  <div class="card">
+    <div class="formula">
+      <b>Formula Used</b><br><br>
+      x = (−b ± √(b² − 4ac)) / 2a
+    </div>
+  </div>
+</div>
+
+<br>
+
+<div class="card">
+  <div id="steps" class="steps">
+    <b>Step-by-Step Solution</b><br><br>—
+  </div>
+</div>
+
+</div>
+
+<script>
+function clean(n){
+  return Math.abs(n) < 1e-12 ? 0 : n;
+}
+
+function solve(){
+  const error = document.getElementById("error");
+  error.innerText = "";
+
+  const a = parseFloat(document.getElementById("a").value.trim());
+  const b = parseFloat(document.getElementById("b").value.trim());
+  const c = parseFloat(document.getElementById("c").value.trim());
+
+  if ([a,b,c].some(v => isNaN(v))) {
+    error.innerText = "Please enter valid numeric coefficients.";
+    return;
+  }
+
+  if (a === 0) {
+    error.innerText = "Coefficient a cannot be zero (not a quadratic equation).";
+    return;
+  }
+
+  const D = clean(b*b - 4*a*c);
+  let resultHTML = "";
+  let stepsHTML = "";
+
+  stepsHTML += `b² − 4ac = (${b})² − 4(${a})(${c})<br>`;
+  stepsHTML += `Discriminant (Δ) = ${D}<br><br>`;
+
+  if (D > 0) {
+    const sqrtD = Math.sqrt(D);
+    const x1 = clean((-b + sqrtD) / (2*a));
+    const x2 = clean((-b - sqrtD) / (2*a));
+
+    resultHTML = `
+      Two Real Roots:<br>
+      x₁ = ${x1.toFixed(6)}<br>
+      x₂ = ${x2.toFixed(6)}
+    `;
+
+    stepsHTML += `Δ > 0 → Two real roots<br><br>`;
+    stepsHTML += `x₁ = (−b + √Δ) / 2a = ${x1}<br>`;
+    stepsHTML += `x₂ = (−b − √Δ) / 2a = ${x2}`;
+
+  } else if (D === 0) {
+    const x = clean(-b / (2*a));
+
+    resultHTML = `
+      One Repeated Root:<br>
+      x = ${x.toFixed(6)}
+    `;
+
+    stepsHTML += `Δ = 0 → One repeated real root<br><br>`;
+    stepsHTML += `x = −b / 2a = ${x}`;
+
+  } else {
+    const real = clean(-b / (2*a));
+    const imag = clean(Math.sqrt(-D) / Math.abs(2*a));
+
+    resultHTML = `
+      Two Complex Roots:<br>
+      x₁ = ${real.toFixed(6)} + ${imag.toFixed(6)}i<br>
+      x₂ = ${real.toFixed(6)} − ${imag.toFixed(6)}i
+    `;
+
+    stepsHTML += `Δ < 0 → Complex conjugate roots<br><br>`;
+    stepsHTML += `Real part = −b / 2a = ${real}<br>`;
+    stepsHTML += `Imaginary part = √|Δ| / 2a = ${imag}i`;
+  }
+
+  document.getElementById("output").innerHTML = resultHTML;
+  document.getElementById("steps").innerHTML =
+    `<b>Step-by-Step Solution</b><br><br>${stepsHTML}`;
+}
+</script>
+
+</body>
+</html>
